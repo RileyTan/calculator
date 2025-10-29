@@ -42,10 +42,30 @@ button {
     border: 0px;
     background-color: rgb(224, 223, 223);
 }
+.grid {
+    display: flex;
+    flex-direction: column;
+}
 
+.grid .row {
+    display: flex;
+    gap: 3px;
+}
+
+.grid button {
+    flex: 1 1 0;
+}
 .special-buttons {
     display: flex;
 }
 .special-buttons button {
     flex-grow: 1; /* fills whole flex parent container */
+}
+
+.operator, #equal {
+    background-color: orange;
+}
+
+#clear, #backspace {
+    background-color: rgb(244, 85, 67);
 }
