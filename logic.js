@@ -1,4 +1,18 @@
-import {add, subtract, multiply, divide} from "./math-helpers"
+const add = (num1, num2) => {
+    return num1 + num2;
+}
+
+const subtract = (num1, num2) => {
+    return num1 - num2;
+}
+
+const multiply = (num1, num2) => {
+    return num1 * num2;
+}
+
+const divide = (num1, num2) => {
+    return num1 / num2;
+}
 // calling operate(1, 2, '+') returns 3 and will change depending on operator
 const operate = (num1, num2, operator) => {
     if (operator === '+') {
@@ -27,17 +41,27 @@ let targetArray = [] // we want to be able to do targetArray = [], hence "let"
 
 // updateDisplayed() will have to be called everytime the array legitimately changes
 const updateDisplay = () => {
-    // find where operator is in the array
+    // if there's nothing in the array 
     if (targetArray.length === 0) {
       mathOperation.textContent = 0
       return [0, null, 0]
     }
+  
+    // find where operator is in the array
     const operatorIndex = targetArray.findIndex(item => operators.includes(item))
 
     // start slicing - note that join() always yield a string
-    const leftPart = targetArray.slice(0, operatorIndex).join("") // "53"
-    const rightPart = targetArray.slice(operatorIndex + 1).join("") // "53" 
-    const operator = targetArray[operatorIndex]
+    let leftPart, rightPart, operator;
+    if (operatorIndex === -1) {
+        // no operator yet, just show the number
+        leftPart = targetArray.join("");
+        rightPart = "";
+        operator = "";
+    } else {
+        leftPart = targetArray.slice(0, operatorIndex).join("");
+        rightPart = targetArray.slice(operatorIndex + 1).join("");
+        operator = targetArray[operatorIndex];
+    }
 
     const expression = `${leftPart} ${operator} ${rightPart}`
 
@@ -55,7 +79,7 @@ const updateResult = (sum) => {
 // buttons - they can always be added, no need for checks
 numberButtons.forEach(numberButton => {
   numberButton.addEventListener("click", () => {
-    targetArray.push(numberButton.textContent);
+    targetArray.push(numberButton.value);
     updateDisplay();
   });
 });
