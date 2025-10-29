@@ -1,5 +1,5 @@
 import {add, subtract, multiply, divide} from "./math-helpers"
-
+import { handleDecimal } from "./regex-helpers"
 // calling operate(1, 2, '+') returns 3 and will change depending on operator
 const operate = (num1, num2, operator) => {
     if (operator === '+') {
@@ -87,7 +87,7 @@ operatorButtons.forEach(operatorButton => {
       targetArray.push(operatorButton.textContent)
     }
 
-    else { // array might be empty 
+    else { // array might be empty, in which case do nothing
       return
     }
     updateDisplay()
@@ -95,48 +95,19 @@ operatorButtons.forEach(operatorButton => {
 })
 
 // decimals 
-// operators - this calculator only allows for a pair of numbers, only 1 operator allowed
-// if array looks like [5, 3, "+", 5, 3] or [5, ".", 3, "+", 5, ".", 3] and
-// when more operators are added, calculate array, display results, clear array and push the results
-// into the empty array, push new operator, update display
-
-// operator can only be pushed into array if there's a number
-// if array looks like [numOperator],we should pop() the current operator and push the selected operator
-operatorButtons.forEach(operatorButton => {
-  operatorButton.addEventListener("click", () => {
-    const joined = targetArray.join("")
-    // array looks like [numOperatornum]
-    if (/^\d*\.?\d+[+\-*/]\d*\.?\d+$/.test(joined)) {
-      const [left, operator, right] = updateDisplay();
-      const result = operate(left, right, operator);
-      updateResult(result)
-      targetArray = []
-      targetArray.push(result)
-      targetArray.push(operatorButton.textContent)
-    }
-    // array looks like [numOperator]
-    else if (/^\d*\.?\d+[+\-*/]$/.test(joined)) {
-      targetArray.pop()
-      targetArray.push(operatorButton.textContent)
-    }
-    // array just has some numbers in it
-    else if (targetArray != null) {
-      targetArray.push(operatorButton.textContent)
-    }
-
-    else { // array might be empty 
-      return
-    }
-    updateDisplay()
-  })
-})
-
-// Attach the event listener
 decimalButton.addEventListener("click", handleDecimal);
 
-// only updateResult() when pressing the equal button if the array looks like [numOperatornum]
+// AC button
+const result = document.querySelector("#result")
+const clearButton = document.querySelector("#clear")
+clearButton.addEventListener("click", () => {
+    targetArray = []
+    mathOperation.textContent = ""
+    result.textContent = ""
+})
 
-// one function to delete numbers from array
+
+// Backspace button
 const backspaceButton = document.querySelector("#backspace")
 backspaceButton.addEventListener("click", () => {
     if (targetArray.length > 0) {
@@ -145,18 +116,12 @@ backspaceButton.addEventListener("click", () => {
     updateDisplay()
     updateResult()
 })
+decimalButton.addEventListener("click", () => {
+  handleDecimal()
+})
 
 // one function to calculate
 // one function to listen out for equal sign - array should be wiped clean and result used as first number 
-
-// code to clear all in array, clear the math operation <div> and result div
-const result = document.querySelector("#result")
-const clearButton = document.querySelector("#clear")
-clearButton.addEventListener("click", () => {
-    targetArray = []
-    mathOperation.textContent = ""
-    result.textContent = ""
-})
 
 // one function to display the array values - assume that the array is currently only 
 // [numOperatornum] example targetArray = [5, 3, "+", 5, 3];
