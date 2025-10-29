@@ -40,7 +40,13 @@ const updateDisplay = () => {
     const mathOperation = document.querySelector("#math-operation")
     mathOperation.textContent = expression
 
-    return parseInt(leftPart), operator, parseInt(rightPart)
+    return [parseInt(leftPart), operator, parseInt(rightPart)]
+}
+
+// #result <div> has to be updated as and when - easier to wrap in a function
+const updateResult = (sum) => {
+  const resultOnScreen = document.querySelector("#result")
+  resultOnScreen.textContent = sum
 }
 
 // buttons - they can always be added, no need for checks
@@ -52,41 +58,78 @@ numberButtons.forEach(numberButton => {
 });
 
 // operators - this calculator only allows for a pair of numbers, only 1 operator allowed
+
 // if array looks like [5, 3, "+", 5, 3] or [5, ".", 3, "+", 5, ".", 3] and
 // when more operators are added, calculate array, display results, clear array and push the results
-// into the empty array
-// operator can only be pushed into array if there's a number, if the array looks like
-// [numOperatornum], we should call operate(), push results, then push operate again
+// into the empty array, push new operator, update display
+
+// operator can only be pushed into array if there's a number
 // if array looks like [numOperator],we should pop() the current operator and push the selected operator
-const operators = ["+", "-", "*", "/"];
+operatorButtons.forEach(operatorButton => {
+  operatorButton.addEventListener("click", () => {
+    const joined = targetArray.join("")
+    // array looks like [numOperatornum]
+    if (/^\d*\.?\d+[+\-*/]\d*\.?\d+$/.test(joined)) {
+      const [left, operator, right] = updateDisplay();
+      const result = operate(left, right, operator);
+      updateResult(result)
+      targetArray = []
+      targetArray.push(result)
+      targetArray.push(operatorButton.textContent)
+    }
+    // array looks like [numOperator]
+    else if (/^\d*\.?\d+[+\-*/]$/.test(joined)) {
+      targetArray.pop()
+      targetArray.push(operatorButton.textContent)
+    }
+    // array just has some numbers in it
+    else if (targetArray.length > 0) {
+      targetArray.push(operatorButton.textContent)
+    }
 
+    else { // array might be empty 
+      return
+    }
+    updateDisplay()
+  })
+})
 
+// decimals 
+// operators - this calculator only allows for a pair of numbers, only 1 operator allowed
+// if array looks like [5, 3, "+", 5, 3] or [5, ".", 3, "+", 5, ".", 3] and
+// when more operators are added, calculate array, display results, clear array and push the results
+// into the empty array, push new operator, update display
 
-export const handleDecimal = () => {
-  const last = targetArray[targetArray.length - 1];
+// operator can only be pushed into array if there's a number
+// if array looks like [numOperator],we should pop() the current operator and push the selected operator
+operatorButtons.forEach(operatorButton => {
+  operatorButton.addEventListener("click", () => {
+    const joined = targetArray.join("")
+    // array looks like [numOperatornum]
+    if (/^\d*\.?\d+[+\-*/]\d*\.?\d+$/.test(joined)) {
+      const [left, operator, right] = updateDisplay();
+      const result = operate(left, right, operator);
+      updateResult(result)
+      targetArray = []
+      targetArray.push(result)
+      targetArray.push(operatorButton.textContent)
+    }
+    // array looks like [numOperator]
+    else if (/^\d*\.?\d+[+\-*/]$/.test(joined)) {
+      targetArray.pop()
+      targetArray.push(operatorButton.textContent)
+    }
+    // array just has some numbers in it
+    else if (targetArray != null) {
+      targetArray.push(operatorButton.textContent)
+    }
 
-  // 1️⃣ Starting a new number or after an operator
-  if (targetArray.length === 0 || operators.includes(last)) {
-    targetArray.push("0", ".");
-    updateDisplay();
-    return;
-  }
-
-  // 2️⃣ Prevent multiple decimals in the current number
-  let i = targetArray.length - 1;
-  let currentNum = "";
-  while (i >= 0 && !operators.includes(targetArray[i])) {
-    currentNum = targetArray[i] + currentNum;
-    i--;
-  }
-
-  if (currentNum.includes(".")) return; // already has a dot
-  if (last === ".") return; // prevent double dot
-
-  // 3️⃣ Otherwise, append decimal
-  targetArray.push(".");
-  updateDisplay();
-};
+    else { // array might be empty 
+      return
+    }
+    updateDisplay()
+  })
+})
 
 // Attach the event listener
 decimalButton.addEventListener("click", handleDecimal);
