@@ -1,5 +1,4 @@
 import {add, subtract, multiply, divide} from "./math-helpers"
-import { handleDecimal } from "./regex-helpers"
 // calling operate(1, 2, '+') returns 3 and will change depending on operator
 const operate = (num1, num2, operator) => {
     if (operator === '+') {
@@ -20,13 +19,19 @@ const operate = (num1, num2, operator) => {
 const numberButtons = document.querySelectorAll(".number");
 const decimalButton = document.querySelector("#decimal")
 const operatorButtons = document.querySelectorAll(".operator")
-
+const mathOperation = document.querySelector("#math-operation");
+const resultOnScreen = document.querySelector("#result")
+const operators = ["+", "-", "*", "/"];
 // initialise array
 let targetArray = [] // we want to be able to do targetArray = [], hence "let"
 
 // updateDisplayed() will have to be called everytime the array legitimately changes
 const updateDisplay = () => {
     // find where operator is in the array
+    if (targetArray.length === 0) {
+      mathOperation.textContent = 0
+      return [0, null, 0]
+    }
     const operatorIndex = targetArray.findIndex(item => operators.includes(item))
 
     // start slicing - note that join() always yield a string
@@ -37,15 +42,13 @@ const updateDisplay = () => {
     const expression = `${leftPart} ${operator} ${rightPart}`
 
     // exhibit on the math-operation <div>
-    const mathOperation = document.querySelector("#math-operation")
     mathOperation.textContent = expression
 
-    return [parseInt(leftPart), operator, parseInt(rightPart)]
+    return [parseFloat(leftPart), operator, parseFloat(rightPart)]
 }
 
 // #result <div> has to be updated as and when - easier to wrap in a function
 const updateResult = (sum) => {
-  const resultOnScreen = document.querySelector("#result")
   resultOnScreen.textContent = sum
 }
 
@@ -65,6 +68,7 @@ numberButtons.forEach(numberButton => {
 
 // operator can only be pushed into array if there's a number
 // if array looks like [numOperator],we should pop() the current operator and push the selected operator
+
 operatorButtons.forEach(operatorButton => {
   operatorButton.addEventListener("click", () => {
     const joined = targetArray.join("")
@@ -75,37 +79,84 @@ operatorButtons.forEach(operatorButton => {
       updateResult(result)
       targetArray = []
       targetArray.push(result)
-      targetArray.push(operatorButton.textContent)
+      targetArray.push(operatorButton.value)
     }
     // array looks like [numOperator]
     else if (/^\d*\.?\d+[+\-*/]$/.test(joined)) {
       targetArray.pop()
-      targetArray.push(operatorButton.textContent)
+      targetArray.push(operatorButton.value)
     }
     // array just has some numbers in it
     else if (targetArray.length > 0) {
-      targetArray.push(operatorButton.textContent)
+      targetArray.push(operatorButton.value)
     }
 
-    else { // array might be empty, in which case do nothing
-      return
+    else { // array might be empty, but there is always a result
+      targetArray.push(resultOnScreen.textContent)
+      targetArray.push(operatorButton.value)
     }
+
     updateDisplay()
   })
 })
 
-// decimals 
+// decimals
+const handleDecimal = () => {
+  const last = targetArray[targetArray.length - 1];
+  const operators = ["+", "-", "*", "/"];
+
+  // if targetArray is [] or if it looks like [9+]/[9/]/[9-]/[9*] and we are trying to 
+  // push a decimal, we need to add a 0 in front to. make it [0.9]/[9+0.9]
+  if (targetArray.length === 0 || operators.includes(last)) {
+    targetArray.push("0");
+    targetArray.push(".");
+    updateDisplay(); // to be edited
+    return;
+  }
+
+  // check current number (everything after last operator) 
+  // we confirmed that (targetArray.length === 0 || operators.includes(last)) is not true
+  // meaning there's either already some numbers in the array or there's some numbers after 
+  // an operator
+  let i = targetArray.length - 1;
+  let currentNum = "";
+  // stop collecting when we bump into an operator 
+  while (i >= 0 && !operators.includes(targetArray[i])) {
+    currentNum = targetArray[i] + currentNum;
+    i--;
+  }
+
+  // prevent invalid decimals
+  if (currentNum.includes(".")) return;
+  if (last === ".") return;
+
+  targetArray.push(".");
+  updateDisplay();
+};
 decimalButton.addEventListener("click", handleDecimal);
 
+// Equal button - array should be wiped clean and result used as first number if another operator is the next button
+const equalButton = document.querySelector("#equal")
+equalButton.addEventListener("click", () => {
+  const joined = targetArray.join("")
+  // [numOperatornum]
+  if (/^\d*\.?\d+[+\-*/]\d*\.?\d+$/.test(joined)) {
+    const [left, operator, right] = updateDisplay()
+    const result = operate(left, right, operator)
+    updateResult(result)
+  }
+  else {
+    return
+  }
+})
+
 // AC button
-const result = document.querySelector("#result")
 const clearButton = document.querySelector("#clear")
 clearButton.addEventListener("click", () => {
     targetArray = []
-    mathOperation.textContent = ""
-    result.textContent = ""
+    mathOperation.textContent = 0
+    updateResult(0)
 })
-
 
 // Backspace button
 const backspaceButton = document.querySelector("#backspace")
@@ -114,21 +165,6 @@ backspaceButton.addEventListener("click", () => {
         targetArray.pop()
     }
     updateDisplay()
-    updateResult()
 })
-decimalButton.addEventListener("click", () => {
-  handleDecimal()
-})
-
-// one function to calculate
-// one function to listen out for equal sign - array should be wiped clean and result used as first number 
-
-// one function to display the array values - assume that the array is currently only 
-// [numOperatornum] example targetArray = [5, 3, "+", 5, 3];
-
-
-// IF WE PRESS EQUAL
-// CALL OPERATE(), DON'T NEED TO EMPTY THE TARGET ARRAY, JUST DISPLAY THE RESULTS, DON'T NEED TO UPDATE DISPLAY
-
 
 

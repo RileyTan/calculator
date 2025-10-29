@@ -1,4 +1,4 @@
-export const handleDecimal = () => {
+const handleDecimal = () => {
   const last = targetArray[targetArray.length - 1];
   const operators = ["+", "-", "*", "/"];
 
