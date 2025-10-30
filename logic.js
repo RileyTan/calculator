@@ -68,6 +68,10 @@ const updateDisplay = () => {
     // exhibit on the math-operation <div>
     mathOperation.textContent = expression
 
+    if (operator === "/" && parseFloat(rightPart) === 0) {
+      mathOperation.textContent = "No dividing by 0! 🤪"
+      return
+    } 
     return [parseFloat(leftPart), operator, parseFloat(rightPart)]
 }
 
@@ -97,7 +101,7 @@ operatorButtons.forEach(operatorButton => {
   operatorButton.addEventListener("click", () => {
     const joined = targetArray.join("")
     // array looks like [numOperatornum]
-    if (/^\d*\.?\d+[+\-*/]\d*\.?\d+$/.test(joined)) {
+    if (/^\d+\.?\d*[+\-*/]\d+\.?\d*$/.test(joined)) {
       const [left, operator, right] = updateDisplay();
       const result = operate(left, right, operator);
       updateResult(result)
@@ -106,7 +110,7 @@ operatorButtons.forEach(operatorButton => {
       targetArray.push(operatorButton.value)
     }
     // array looks like [numOperator]
-    else if (/^\d*\.?\d+[+\-*/]$/.test(joined)) {
+    else if (/^\d+\.?\d*[+\-*/]$/.test(joined)) {
       targetArray.pop()
       targetArray.push(operatorButton.value)
     }
