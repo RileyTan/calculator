@@ -1,5 +1,7 @@
-# calculator
-Calculator that evaluates a single pair of numbers at a time.
+# Calculator
+Available at https://rileytan.github.io/calculator/
+
+This is a calculator that evaluates a single pair of numbers at a time.
 It currently does not support negative values.
 
 I centered everything around an array which helped me divide the project into 2 parts which is the input of the array and output of the array. 
